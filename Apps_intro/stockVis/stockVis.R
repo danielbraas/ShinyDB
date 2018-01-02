@@ -31,7 +31,8 @@ ui <- fluidPage(
                     "Adjust prices for inflation", value = FALSE)
     ),
 
-    mainPanel(plotOutput("plot"))
+    mainPanel(plotOutput("plot"),
+              plotOutput('CPI'))
   )
 )
 
@@ -43,9 +44,21 @@ server <- function(input, output) {
                from = input$dates[1],
                to = input$dates[2],
                auto.assign = FALSE)
+
+  })
+  finalInput <- reactive({
+    if (!input$adjust) return(dataInput())
+    adjust(dataInput())
   })
 
+
   output$plot <- renderPlot({
+
+    chartSeries(finalInput(), theme = chartTheme("white"),
+                type = "line", log.scale = input$log, TA = NULL)
+  })
+  output$CPI <- renderPlot({
+    if(!input$adjust) return(NULL)
 
     chartSeries(dataInput(), theme = chartTheme("white"),
                 type = "line", log.scale = input$log, TA = NULL)

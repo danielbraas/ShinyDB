@@ -17,18 +17,19 @@ ui <- fluidPage(
       textInput('msconvert', label = 'Location to the msconvert.exe file:', value = 'C:/pwiz/msconvert.exe'),
       tags$hr(),
       tags$br(),
-      fileInput("input_files", "Choose files to be converted (currently only .raw"),
+      fileInput("input_files", "Choose files to be converted (currently only .raw",
       accept = c( '.raw'),
-      multiple = T
+      multiple = T)
     ),
 
-    mainPanel('Nothing yet')
-    )
+    mainPanel(textOutput('msconvert'))
+  )
 )
 
 
 # Server logic ----
 server <- function(input, output) {
+  output$msconvert <- renderText(paste(input$msconvert, 'hihi'))
 
 }
 

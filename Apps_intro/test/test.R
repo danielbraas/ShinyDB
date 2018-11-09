@@ -1,37 +1,62 @@
 library(shiny)
 
-ui <- shinyUI(
-  fluidPage(
-    titlePanel(title = h1('This is my first shiny app, hello shiny!')),
-    sidebarLayout(
-      sidebarPanel(
-        sliderInput(inputId = "num",
-                    label = "Choose a number",
-                    value = 25, min = 1, max = 100)
-      ),
-      mainPanel = NULL
+
+ui <- fluidPage(
+  
+  # App title ----
+  titlePanel("Hello Shiny!"),
+  
+  # Sidebar layout with input and output definitions ----
+  sidebarLayout(
+    
+    # Sidebar panel for inputs ----
+    sidebarPanel(
+      
+      # Input: Slider for the number of bins ----
+      selectInput(inputId = "bins",
+                  label = "Rownames:",
+                  choices = bins[1])
+      
     ),
-    textOutput('number'),
-    sidebarLayout(
-      position = 'right',
-      sidebarPanel(
-        selectInput(
-          inputId = 'group',
-          label = 'Group',
-          choices = c('Good','OK','Bad'),
-          selected = 'OK'
-        )
-      ),
-      mainPanel(h1('more text'))
-    ),
-    textOutput('choice')
+    
+    # Main panel for displaying outputs ----
+    mainPanel(
+      
+      # Output: Histogram ----
+      #plotOutput(outputId = "distPlot")
+      
+    )
   )
 )
-server <- shinyServer(
-  function(input, output) {
-    output$number <- input$num
-    output$choice <- input$group
-  }
-)
+
+
+
+#Here is the server function for the Hello Shiny example.
+
+# Define server logic required to draw a histogram ----
+server <- function(input, output) {
+  
+  # Histogram of the Old Faithful Geyser Data ----
+  # with requested number of bins
+  # This expression that generates a histogram is wrapped in a call
+  # to renderPlot to indicate that:
+  #
+  # 1. It is "reactive" and therefore should be automatically
+  #    re-executed when inputs (input$bins) change
+  # 2. Its output type is a plot
+  #output$distPlot <- renderPlot({
+    
+  #  x    <- faithful$waiting
+  #  bins <- seq(min(x), max(x), length.out = input$bins + 1)
+    test <- read.csv('my_test.csv', header=T)
+  
+    bins <- names(test)
+  #  hist(x, breaks = bins, col = "#75AADB", border = "white",
+  #       xlab = "Waiting time to next eruption (in mins)",
+  #       main = "Histogram of waiting times")
+    
+#  })
+  
+}
 
 shinyApp(ui = ui, server = server)

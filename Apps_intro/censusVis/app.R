@@ -4,7 +4,7 @@ library(maps)
 library(mapproj)
 #This is the censusVis app as shown in the RStudio tutorial at  https://shiny.rstudio.com/tutorial/written-tutorial/lesson4/
 
-setwd("C:/Users/Daniel/Dropbox/projects/ShinyDB/Apps_intro/censusVis")
+setwd("~/Dropbox/R_projects/ShinyDB/Apps_intro/censusVis")
 
 
 source("R/helpers.R")

@@ -2,4 +2,4 @@
 
 This Repo will be used for future Shiny applications.
 
-This works really well for me right now...
+Some apps will be about UI style while others will have complete functionality.

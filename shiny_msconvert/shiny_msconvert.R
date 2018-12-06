@@ -5,7 +5,7 @@ library(tidyverse)
 # While the GUI has a lot of filters, it doesn't allow one to, for instance, select a polarity in case of MS data that was recorded with polarity switching.
 #
 
-setwd("C:/Users/Daniel/Dropbox/projects/ShinyDB/shiny_msconvert")
+#setwd("C:/Users/Daniel/Dropbox/projects/ShinyDB/shiny_msconvert")
 
 
 ui <- fluidPage(

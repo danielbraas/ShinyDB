@@ -1,8 +1,7 @@
 library(tidyverse)
-
 library(shiny)
 library(shinyFiles)
-#library(fs)
+
 
 server <- function(input, output, session) {
   
@@ -24,22 +23,10 @@ server <- function(input, output, session) {
   
   #Load file only if file was selected
   dat <- eventReactive(input$files,{
-    
     if (!is.integer(input$files[1])){
       read.csv(parseFilePaths(volumes, input$files)$datapath)
     }
   }) 
-  
- # output$tab <- renderDataTable(dat())
-  
-  
-  df <- reactive({
-    req(input$dataset)
-    switch(input$dataset,
-           pressure = pressure,
-           cars = cars,
-           mtcars = mtcars)
-  })
   
   observe({
     updateSelectInput(session, 'column_x', choices = c('Choose'='', names(dat())))
@@ -77,14 +64,8 @@ server <- function(input, output, session) {
   
   
   output$summary <- renderDataTable({
-    coldata()
+    dat()
   })
-  
-# do something with the data ----------------------------------------------
-
-#  output$plot <- renderPlot({
-  
-#  })
   
 }
 
@@ -114,3 +95,6 @@ ui <- pageWithSidebar(
 )
 
 shinyApp(ui = ui, server = server)
+
+## To start this app from the R command line type:
+## shell("R -e \"shiny::runApp(\'load_table5.R')\"")

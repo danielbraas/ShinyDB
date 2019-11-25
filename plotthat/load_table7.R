@@ -1,15 +1,14 @@
 library(tidyverse)
 library(shiny)
 library(shinyFiles)
+library(DT)
 
+
+# I modified the Rprofile file of the base package to set the variable for dropbox
 
 server <- function(input, output, session) {
   
-  volumes <- c(wd = 'C:/',
-               dropbox = 'C:/Users/Daniel/Dropbox/',
-               R_projects = 'C:/Users/Daniel/Dropbox/R_projects/',
-               Shiny = 'C:/Users/Daniel/Dropbox/R_projects/ShinyDB/')
-  wd <- getwd()
+  volumes <- jsonlite::fromJSON(read_lines('C:/R_lib/config.json'))$Shiny
 
 # select and load a table -------------------------------------------------
 
@@ -24,29 +23,35 @@ server <- function(input, output, session) {
   #Load file only if file was selected
   dat <- reactive({
     if (!is.integer(input$files[1])){
-      read.csv(parseFilePaths(volumes, input$files)$datapath)
+      
+      read_csv(parseFilePaths(volumes, input$files)$datapath,
+               col_names = input$heading,
+               na = input$na.string)
     }
-  }) 
-  
+  })
+
+# update values for selecters ---------------------------------------------
+
   observe({
-    updateSelectInput(session, 'column_x', choices = c('Choose'='', names(dat())))
-    updateSelectInput(session, 'column_y', choices = c('Choose'='', names(dat())))
+    updateSelectizeInput(session = session, 
+                         inputId = 'rows', 
+                         choices = c('Choose'='', c('None', names(dat()))),
+                         selected = 'None')
+    updateSelectInput(session, 'column_x', 
+                      choices = c('Choose'='', names(dat())))
+    
+    updateSelectInput(session, 'column_y', 
+                      choices = c('Choose'='', names(dat())))
+    
     updateSelectInput(session, 'color', 
                       choices = c('Choose'='', c('None', names(dat()))),
                       selected = 'None')
-  })
-  
-  coldata <- reactive({
-    req(input$column_x)
-    req(input$column_y)
     
-    select(dat(), input$column_x, input$column_y)
-#    output$plot <- renderPlot({
-#      ggplot(dat(), aes(input$column_x, input$column_y))+
-#        geom_point()
-#    })
+    print(input$rows)
   })
-  
+
+# Work on data to produce plot --------------------------------------------
+
   output$plot <- renderPlot({
     req(input$column_x, input$column_y)
     
@@ -61,10 +66,10 @@ server <- function(input, output, session) {
     
     print(p)
   })
-  
-  
-  output$summary <- renderDataTable({
-    dat()
+
+  output$summary <- renderDT({
+    
+    datatable(dat(), editable = 'cell', rownames = input$rows)
   })
   
 }
@@ -77,8 +82,14 @@ ui <- pageWithSidebar(
   sidebarPanel(
     tags$p(strong("Input File")),
     shinyFilesButton("files", "Choose File", "Please select a file", multiple = F),
+    checkboxInput(inputId = "heading", 
+                  label = "Has header?"),
+    selectizeInput(inputId = 'rows', 
+                  label = 'Use rownames?',
+                  choices = character(0),
+                  selected = 'None'),
+    textInput("na.string", "NA symbol", value = "NA"),
     tags$hr(),
-    #selectInput('dataset', 'Dataset', c("Choose"="", 'pressure','cars','mtcars')),
     selectInput('column_x','x-Column ', character(0)),
     selectInput('column_y','y-Column ', character(0)),
     selectInput('color', 'Color', character(0))
@@ -89,8 +100,7 @@ ui <- pageWithSidebar(
     verbatimTextOutput("filepath"),
     tags$hr(),
     plotOutput('plot'),
-    dataTableOutput('summary')
-  #  dataTableOutput('tab')
+    DTOutput('summary')
   )
 )
 

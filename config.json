@@ -1,0 +1,10 @@
+{
+  "MS": ["C:/MS"],
+  "Shiny": {
+    "Root": "C:/",
+	"MS2": "C:/Users/Daniel/Dropbox/R_projects/MS2"
+    "Dropbox": "C:/Users/Daniel/Dropbox/",
+    "R_projects": "C:/Users/Daniel/Dropbox/R_projects/",
+    "Shiny": "C:/Users/Daniel/Dropbox/R_projects/ShinyDB/"
+  }
+}

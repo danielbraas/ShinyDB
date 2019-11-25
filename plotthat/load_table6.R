@@ -2,11 +2,12 @@ library(tidyverse)
 library(shiny)
 library(shinyFiles)
 
+dropbox <- 'C:/Users/Daniel/Dropbox/'
 
 server <- function(input, output, session) {
   
   volumes <- c(wd = 'C:/',
-               dropbox = 'C:/Users/Daniel/Dropbox/',
+               Dropbox = dropbox,
                R_projects = 'C:/Users/Daniel/Dropbox/R_projects/',
                Shiny = 'C:/Users/Daniel/Dropbox/R_projects/ShinyDB/')
   wd <- getwd()
@@ -24,11 +25,22 @@ server <- function(input, output, session) {
   #Load file only if file was selected
   dat <- reactive({
     if (!is.integer(input$files[1])){
-      read.csv(parseFilePaths(volumes, input$files)$datapath)
+      read.csv(parseFilePaths(volumes, input$files)$datapath,
+               header = input$heading,
+               row.names = input$rowNames,
+               stringsAsFactors = input$strings,
+               na.string = input$na.string)
     }
   }) 
   
   observe({
+    print(rownames(dat()))
+  })
+
+#  Do something with the data ---------------------------------------------
+
+  observe({
+    updateSelectizeInput(session, 'rowNames', choices = c('Choose', names(dat())))
     updateSelectInput(session, 'column_x', choices = c('Choose'='', names(dat())))
     updateSelectInput(session, 'column_y', choices = c('Choose'='', names(dat())))
     updateSelectInput(session, 'color', 
@@ -41,10 +53,7 @@ server <- function(input, output, session) {
     req(input$column_y)
     
     select(dat(), input$column_x, input$column_y)
-#    output$plot <- renderPlot({
-#      ggplot(dat(), aes(input$column_x, input$column_y))+
-#        geom_point()
-#    })
+
   })
   
   output$plot <- renderPlot({
@@ -77,6 +86,11 @@ ui <- pageWithSidebar(
   sidebarPanel(
     tags$p(strong("Input File")),
     shinyFilesButton("files", "Choose File", "Please select a file", multiple = F),
+    checkboxInput("heading", "Has header?"),
+    #selectizeInput('rowNames', ),
+    selectizeInput('rowNames', label = 'Has rownames?', character(0) ),
+    checkboxInput("strings", "Coerce strings to factors"),
+    textInput("na.string", "NA symbol", value = "NA"),
     tags$hr(),
     #selectInput('dataset', 'Dataset', c("Choose"="", 'pressure','cars','mtcars')),
     selectInput('column_x','x-Column ', character(0)),

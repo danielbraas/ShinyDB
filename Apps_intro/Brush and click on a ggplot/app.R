@@ -10,11 +10,19 @@ server <- function(input, output, session) {
   
   # observe for user interaction and change the global interaction_type
   # variable
-  observeEvent(input$user_click, interaction_type <<- "click")
-  observeEvent(input$user_brush, interaction_type <<- "brush")
-  
+  observeEvent(input$user_click, {
+    interaction_type <<- "click"
+    print(input$user_click)
+    })
+  observeEvent(input$user_brush, {
+    interaction_type <<- "brush"
+    print(input$user_brush)
+    })
+
+    
   output$plot <- renderPlot({
-    ggplot(mtcars, aes(wt, mpg)) + geom_point()
+    p <- ggplot(mtcars, aes_string(input$x_col, input$y_col)) + geom_point()
+    p
   })
   
   # generate the data to put in the table
@@ -38,6 +46,8 @@ server <- function(input, output, session) {
 ui <- fluidPage(
   
   h3("Click or brush the plot and it will filter the table"),
+  selectInput(inputId = 'x_col', 'X', choices = c('Choose'='', names(mtcars))),
+  selectInput(inputId = 'y_col', 'Y', choices = c('Choose'='', names(mtcars))),
   plotOutput("plot", click = "user_click", brush = "user_brush"),
   DT::dataTableOutput("table")
   

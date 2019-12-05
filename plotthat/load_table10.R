@@ -95,7 +95,7 @@ server <- function(input, output, session) {
   
     return(res)
     
-  })
+    })
 
 # render output as editable table using DT package ------------------------
   
@@ -114,32 +114,44 @@ server <- function(input, output, session) {
   
 }
 
-ui <- pageWithSidebar(
-  headerPanel(
-    "Select Data Table"
-  ),
-  
-  sidebarPanel(
-    tags$p(strong("Input File")),
-    shinyFilesButton("files", "Choose File", "Please select a file", multiple = F),
-    checkboxInput(inputId = "heading", 
-                  label = "Has header?"),
-    selectInput(inputId = 'rows', 
-                  label = 'Use rownames?',
-                  choices = character(0)),
-    textInput("na.string", "NA symbol", value = "NA"),
-    tags$hr(),
-    selectInput('column_x','x-Column ', character(0)),
-    selectInput('column_y','y-Column ', character(0)),
-    selectInput('color', 'Color', character(0))
-  ),
+# UI ----------------------------------------------------------------------
 
-  mainPanel(
-    tags$h4("Input File:"),
-    verbatimTextOutput("filepath"),
-    tags$hr(),
-    plotOutput("plot", click = "user_click", brush = "user_brush"),
-    DTOutput('summary')
+ui <- fluidPage(
+  shinythemes::themeSelector(),
+  theme = shinythemes::shinytheme('spacelab'),
+  title = 'Plotthat',
+  titlePanel('Plotthat'),
+  hr(),
+  
+  fluidRow(
+    column(width = 2,
+           
+           tags$p(strong("Input File")),
+           shinyFilesButton(id = "files", 
+                            label = "Choose File", 
+                            title = "Please select a file", 
+                            multiple = F,
+                            icon = icon('folder-open')),
+           checkboxInput(inputId = "heading", 
+                         label = "Has header?"),
+           selectInput(inputId = 'rows', 
+                       label = 'Use rownames?',
+                       choices = character(0)),
+           textInput("na.string", "NA symbol", value = "NA"),
+           tags$hr(),
+           tags$p(strong("Plot information")),
+           selectInput('column_x','x-Column ', character(0)),
+           selectInput('column_y','y-Column ', character(0)),
+           selectInput('color', 'Color', character(0))     
+           
+           ),
+    column(width = 10,
+           tags$h4("Input File:"),
+           verbatimTextOutput("filepath"),
+           tags$hr(),
+           plotOutput("plot", click = "user_click", brush = "user_brush"),
+           DTOutput('summary')
+           )
   )
 )
 

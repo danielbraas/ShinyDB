@@ -8,7 +8,7 @@ library(DT)
 
 server <- function(input, output, session) {
   
-  volumes <- jsonlite::fromJSON(read_lines('C:/R_lib/config.json'))$Shiny
+  volumes <- jsonlite::fromJSON(read_lines('~/config.json'))$Shiny
 
 # select and load a table -------------------------------------------------
 
@@ -36,7 +36,7 @@ server <- function(input, output, session) {
     updateSelectInput(session = session, 
                          inputId = 'rows', 
                          choices = c('Choose'='', c('None', names(dat()))))
-                         
+    
     updateSelectInput(session, 'column_x', 
                       choices = c('Choose'='', names(dat())))
     
@@ -54,7 +54,11 @@ server <- function(input, output, session) {
   output$plot <- renderPlot({
     req(dat(), input$column_x, input$column_y)
     
-    p <- ggplot(dat(), aes_string(input$column_x, input$column_y)) +
+    # Explicitly naming columns in case that they do not conform to variable names
+    x_col <- paste0('`', input$column_x, '`')
+    y_col <- paste0('`', input$column_y, '`')
+     
+    p <- ggplot(dat(), aes_string(x = x_col, y = y_col)) +
       geom_point()+
       theme_bw()+
       theme(text = element_text(size = 16, face = 'bold'))
@@ -101,15 +105,29 @@ server <- function(input, output, session) {
   
   output$summary <- renderDT({
     req(dat())
+    
     if(nrow(dat2()) > 0){
-      datatable(dat2(), 
-                editable = 'cell', 
-                rownames = pull(dat2(), input$rows))
+      
+      ret <- dat2()
+      
     } else {
-      datatable(dat(),
-                editable = 'cell',
-                rownames = pull(dat(), input$rows))
+      
+      ret <- dat()
+      
     }
+    
+    if(input$rows %in% c('None','')){
+      
+      ret <- datatable(ret,
+                       editable = 'cell')
+    
+    } else {
+      
+      ret <- datatable(ret, 
+                       editable = 'cell',
+                       rownames = pull(ret, input$rows))
+    }
+    ret
   })
   
 }
@@ -117,8 +135,8 @@ server <- function(input, output, session) {
 # UI ----------------------------------------------------------------------
 
 ui <- fluidPage(
-  shinythemes::themeSelector(),
-  theme = shinythemes::shinytheme('spacelab'),
+  #shinythemes::themeSelector(),
+  theme = shinythemes::shinytheme('braasian'),
   title = 'Plotthat',
   titlePanel('Plotthat'),
   hr(),

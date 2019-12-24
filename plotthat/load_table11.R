@@ -17,7 +17,7 @@ ui <- fluidPage(
     column(
       width = 2,
       loadFileUI(id = "Plotthatfile", 
-                 label = 'Select a data file\n(csv files only)'),
+                 label = 'Select a data file'),
       tags$hr(),
       h3("Plot information"),
       selectInput(inputId = 'column_x',
@@ -56,9 +56,9 @@ server <- function(input, output, session){
   
   
   dat <- callModule(loadFile, 
-                    id = "Plotthatfile",
-                    volumes = volumes)   # "Plotthatfile" is the namespace for the function call
-                         
+                    id = "Plotthatfile",   # "Plotthatfile" is the namespace for the function call
+                    volumes = volumes,
+                    file.type = c('csv','rds'))
   
   # update values for selecters ---------------------------------------------
   
